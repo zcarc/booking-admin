@@ -40,12 +40,20 @@ const Login = () => {
 
       console.log("res.data: ", res.data);
 
-      dispatch({
-        type: LOGIN_SUCCESS,
-        payload: res.data,
-      });
+      // isAdmin 속성에 따라 로그인 분기처리
+      if (res.data.isAdmin) {
+        dispatch({
+          type: LOGIN_SUCCESS,
+          payload: res.data.details,
+        });
 
-      navigate("/");
+        navigate("/");
+      } else {
+        dispatch({
+          type: LOGIN_FAILURE,
+          payload: { message: "You are not allowed!" },
+        });
+      }
     } catch (error) {
       dispatch({
         type: LOGIN_FAILURE,
@@ -76,6 +84,7 @@ const Login = () => {
         <button className="lButton" onClick={handleClick} disabled={loading}>
           로그인
         </button>
+        {error && <span>{error.message}</span>}
       </div>
     </div>
   );
