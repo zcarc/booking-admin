@@ -35,7 +35,10 @@ const Login = () => {
     try {
       const res = await axios.post(
         "http://localhost:8800/auth/login",
-        credentials
+        credentials,
+        {
+          withCredentials: true,
+        }
       );
 
       console.log("res.data: ", res.data);
