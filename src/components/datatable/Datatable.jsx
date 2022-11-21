@@ -1,6 +1,5 @@
 import "./datatable.scss";
 import { DataGrid } from "@mui/x-data-grid";
-import { userColumns } from "../../datatablesource";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
@@ -13,10 +12,9 @@ const Datatable = ({ columns }) => {
   const path = location.pathname.split("/")[1];
 
   const [list, setList] = useState();
-  const { data, loading, error } = useFetch(`http://localhost:8800/${path}`);
 
-  console.log("location.path: ", location.path);
-  console.log("data: ", data);
+  // /uers, /hotels, /room 루트 이름에 따라 path로 동적으로 get 요청
+  const { data, loading, error } = useFetch(`http://localhost:8800/${path}`);
 
   const handleDelete = async (id) => {
     try {
@@ -57,8 +55,8 @@ const Datatable = ({ columns }) => {
   return (
     <div className="datatable">
       <div className="datatableTitle">
-        Add New User
-        <Link to="/users/new" className="link">
+        {path}
+        <Link to={`/${path}/new`} className="link">
           Add New
         </Link>
       </div>
