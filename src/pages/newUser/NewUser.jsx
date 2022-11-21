@@ -1,11 +1,52 @@
-import "./new.scss";
+import "./newUser.scss";
 import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { useState } from "react";
+import axios from "axios";
 
-const New = ({ inputs, title }) => {
+const NewUser = ({ inputs, title }) => {
+  console.log("New...");
+
   const [file, setFile] = useState("");
+  const [info, setInfo] = useState({});
+
+  const handleChange = (e) => {
+    setInfo((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+  };
+
+  const handleClick = async (e) => {
+    e.preventDefault();
+
+    // .env에서 할당한 환경변수 값을 가져옴 (CRA 기준 환경변수명)
+    const cloudName = process.env.REACT_APP_CLOUD_NAME;
+    const uploadPreset = process.env.REACT_APP_UPLOAD_PRESET;
+
+    const data = new FormData();
+
+    // Required parameters for unauthenticated requests:
+    data.append("file", file);
+    data.append("upload_preset", uploadPreset);
+
+    try {
+      const uploadRes = await axios.post(
+        `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+        data
+      );
+
+      const { url } = uploadRes.data;
+
+      const newUser = {
+        ...info,
+        img: url,
+      };
+
+      console.log("newUser: ", newUser);
+      await axios.post("http://localhost:8800/auth/register", newUser);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="new">
@@ -43,10 +84,15 @@ const New = ({ inputs, title }) => {
               {inputs.map((input) => (
                 <div className="formInput" key={input.id}>
                   <label>{input.label}</label>
-                  <input type={input.type} placeholder={input.placeholder} />
+                  <input
+                    id={input.id}
+                    onChange={handleChange}
+                    type={input.type}
+                    placeholder={input.placeholder}
+                  />
                 </div>
               ))}
-              <button>Send</button>
+              <button onClick={handleClick}>Send</button>
             </form>
           </div>
         </div>
@@ -55,4 +101,4 @@ const New = ({ inputs, title }) => {
   );
 };
 
-export default New;
+export default NewUser;
